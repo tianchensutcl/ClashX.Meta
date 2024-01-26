@@ -63,7 +63,7 @@ enum ClashProxyType: String, Codable, CaseIterable {
 
     static func isBuiltInProxy(_ proxy: ClashProxy) -> Bool {
         switch proxy.name {
-        case "DIRECT", "REJECT", "PASS": return true
+        case "DIRECT", "REJECT", "REJECT-DROP", "PASS", "COMPATIBLE": return true
         default: return false
         }
     }
