@@ -73,10 +73,7 @@ class MetaTask: NSObject {
 				print("Test meta config success.")
 			}
 			
-			guard var serverResult = self.parseConfFile(confPath, confFilePath: confFilePath) else {
-				returnResult("Can't decode config file.")
-				return
-			}
+			var serverResult = MetaServer(externalController: "", secret: "")
 			
 			self.proc.arguments = args
 			self.proc.qualityOfService = .userInitiated

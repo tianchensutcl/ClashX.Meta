@@ -788,9 +788,13 @@ extension AppDelegate {
 
         Logger.log("Trying start meta core")
 
+		var config: ClashMetaConfig.Config!
+		
         prepareConfigFile().then {
             self.generateInitConfig()
-        }.then {
+		}.get {
+			config = $0
+		}.then {
             self.startMeta($0)
         }.get { res in
             if let log = res.log {
@@ -801,9 +805,9 @@ extension AppDelegate {
 """, level: .info)
             }
 
-            let port = res.externalController.components(separatedBy: ":").last ?? "9090"
+            let port = config.externalController.components(separatedBy: ":").last ?? "9090"
             ConfigManager.shared.apiPort = port
-            ConfigManager.shared.apiSecret = res.secret
+			ConfigManager.shared.apiSecret = config.secret ?? ""
             ConfigManager.shared.isRunning = true
             self.proxyModeMenuItem.isEnabled = true
             self.dashboardMenuItem.isEnabled = true
