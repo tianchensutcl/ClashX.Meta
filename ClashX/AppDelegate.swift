@@ -64,6 +64,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var runAfterConfigReload: (() -> Void)?
 	
+	var coreStarterActivated = false
 	var updateGeoTimer: Timer?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -742,6 +743,9 @@ extension AppDelegate {
 	
 	
 	func startProxyCore() {
+		guard !coreStarterActivated else { return }
+		coreStarterActivated = true
+		
 		func attempt<T>(maximumRetryCount: Int = 3, delayBeforeRetry: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
 			var attempts = 0
 			func attempt() -> Promise<T> {
