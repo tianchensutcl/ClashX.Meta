@@ -23,7 +23,7 @@ class MetaTask: NSObject {
     @objc func start(_ confPath: String,
 					 confFilePath: String,
 					 confJSON: String,
-					 result: @escaping stringReplyBlock) {
+					 result: @escaping (String?) -> Void) {
         
         var resultReturned = false
         
@@ -34,6 +34,11 @@ class MetaTask: NSObject {
             resultReturned = true
 			result(re)
         }
+		
+		guard proc.executableURL != nil else {
+			returnResult("Can't find LaunchPath.")
+			return
+		}
         
         var args = [
             "-d",
@@ -266,7 +271,7 @@ class MetaTask: NSObject {
         proc.waitUntilExit()
     }
     
-    @objc func getUsedPorts(_ result: @escaping stringReplyBlock) {
+    @objc func getUsedPorts(_ result: @escaping (String?) -> Void) {
         let proc = Process()
         let pipe = Pipe()
         proc.standardOutput = pipe

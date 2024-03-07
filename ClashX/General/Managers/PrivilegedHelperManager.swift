@@ -13,7 +13,6 @@ import ServiceManagement
 
 class PrivilegedHelperManager {
     let isHelperCheckFinished = BehaviorRelay<Bool>(value: false)
-	let isHelperReady = BehaviorRelay<Bool>(value: false)
 	
 	
     private var cancelInstallCheck = false

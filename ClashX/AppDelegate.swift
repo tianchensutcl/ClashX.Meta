@@ -64,7 +64,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var runAfterConfigReload: (() -> Void)?
 	
-	var helperStatusTimer: Timer?
 	var updateGeoTimer: Timer?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -287,30 +286,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.tunModeMenuItem.state = config.tun.enable ? .on : .off
                 ConfigManager.shared.isTunModeVariable.accept(config.tun.enable)
             }.disposed(by: disposeBag)
-
-        // start proxy
-		PrivilegedHelperManager.shared.isHelperReady
-			.filter({$0})
-			.take(1)
-			.observe(on: MainScheduler.instance)
-			.bind(onNext: { _ in
-				Logger.log("HelperReady")
-				self.initMetaCore()
-				self.startProxy()
-			}).disposed(by: disposeBag)
-		
-		helperStatusTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { timer in
-			timer.fireDate = .init(timeIntervalSinceNow: 3600)
-			
-			PrivilegedHelperManager.shared.helper {
-				Logger.log("Check helper status Error, will try again")
-				timer.fireDate = .init(timeIntervalSinceNow: 0.3)
-			}?.getVersion {
-				Logger.log("Check helper status success \($0 ?? "")")
-				timer.invalidate()
-				PrivilegedHelperManager.shared.isHelperReady.accept(true)
-			}
-		}
 		
 		if !PrivilegedHelperManager.shared.isHelperCheckFinished.value {
 			proxySettingMenuItem.target = nil
@@ -323,16 +298,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 					guard let self = self else { return }
 					self.proxySettingMenuItem.target = self
 					self.tunModeMenuItem.target = self
-					
-					self.helperStatusTimer?.fire()
-					Logger.log("Fire helperStatusTimer")
+					self.startProxyCore()
 				}.disposed(by: disposeBag)
 		} else {
 			self.proxySettingMenuItem.target = self
 			self.tunModeMenuItem.target = self
-			
-			self.helperStatusTimer?.fire()
-			Logger.log("Fire helperStatusTimer")
+			startProxyCore()
 		}
 
 		
@@ -360,17 +331,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         remoteConfigAutoupdateMenuItem.state = RemoteConfigManager.autoUpdateEnable ? .on : .off
 
-        if !PrivilegedHelperManager.shared.isHelperCheckFinished.value {
-            proxySettingMenuItem.target = nil
-            PrivilegedHelperManager.shared.isHelperCheckFinished
-                .filter { $0 }
-                .take(1)
-                .observe(on: MainScheduler.instance)
-                .subscribe { [weak self] _ in
-                    guard let self = self else { return }
-                    self.proxySettingMenuItem.target = self
-                }.disposed(by: disposeBag)
-        }
     }
 
     func setupNetworkNotifier() {
@@ -519,7 +479,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 		if let path = corePath.0 {
 			RemoteConfigManager.shared.verifyConfigTask.setLaunchPath(path)
-			PrivilegedHelperManager.shared.helper()?.initMetaCore(withPath: path)
+			PrivilegedHelperManager.shared.helper()?.initMetaCore(path: path)
 			Logger.log("initClashCore finish")
 		} else {
 			let msg = corePath.1 ?? "Load internal Meta Core failed."
@@ -669,7 +629,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 return
             }
 
-            PrivilegedHelperManager.shared.helper()?.updateTun(with: enable)
+			PrivilegedHelperManager.shared.helper()?.updateTun(state: enable)
             Logger.log("tun state updated, new: \(enable)")
         }
     }
@@ -770,14 +730,73 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate {
 
     enum StartMetaError: Error {
+		case helperVersion
+		case helperStart
+		
         case configMissing
         case remoteConfigMissing
         case startMetaFailed(String)
         case helperNotFound
         case pushConfigFailed(String)
     }
+	
+	
+	func startProxyCore() {
+		func attempt<T>(maximumRetryCount: Int = 3, delayBeforeRetry: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
+			var attempts = 0
+			func attempt() -> Promise<T> {
+				attempts += 1
+				return body().recover { error -> Promise<T> in
+					guard attempts < maximumRetryCount else { throw error }
+					return after(delayBeforeRetry).then(attempt)
+				}
+			}
+			return attempt()
+		}
+		
+		func checkHelperVersion() -> Promise<String?> {
+			Promise { resolver in
+				PrivilegedHelperManager.shared.helper {
+					Logger.log("Helper, check status failed, will try again")
+					resolver.reject(StartMetaError.helperVersion)
+				}?.getVersion {
+					Logger.log("Helper, check status success \($0)")
+					resolver.fulfill($0)
+				}
+			}
+		}
+		
+		func startProxy() -> Promise<()> {
+			Promise { resolver in
+				self.startProxy {
+					if $0 {
+						Logger.log("Helper, start core failed, will try again")
+						resolver.reject(StartMetaError.helperStart)
+					} else {
+						Logger.log("Helper, start core success")
+						resolver.fulfill_()
+					}
+				}
+			}
+		}
+		
+		initMetaCore()
+		
+		attempt(maximumRetryCount: 360,
+				delayBeforeRetry: .milliseconds(500)) {
+			checkHelperVersion()
+		}.then { _ in
+			attempt(maximumRetryCount: 30,
+					delayBeforeRetry: .seconds(2)) {
+				startProxy()
+			}
+		}.catch {
+			Logger.log("Helper, attempt error \($0)")
+		}
+	}
+	
 
-    func startProxy() {
+	func startProxy(shouldRetry: ((Bool) -> Void)? = nil) {
         if ConfigManager.shared.isRunning { return }
 
         Logger.log("Trying start meta core")
@@ -801,21 +820,30 @@ extension AppDelegate {
             ConfigManager.shared.isRunning = true
             self.proxyModeMenuItem.isEnabled = true
             self.dashboardMenuItem.isEnabled = true
+			
+			shouldRetry?(false)
         }.then { _ in
             self.pushInitConfig()
         }.done {
             Logger.log("Init config file success.")
 			
 			self.showUpdateNotification("ClashX_Meta_1.3.0_UpdateTips", info: "Config Floder migrated from\n~/.config/clash to\n~/.config/clash.meta")
-			
-			
         }.catch { error in
             ConfigManager.shared.isRunning = false
             self.proxyModeMenuItem.isEnabled = false
             Logger.log("\(error)", level: .error)
 
-            let unc = NSUserNotificationCenter.default
-
+			switch error {
+			case StartMetaError.helperNotFound:
+				shouldRetry?(true)
+				if shouldRetry != nil {
+					return
+				}
+			default:
+				shouldRetry?(false)
+			}
+			
+			let unc = NSUserNotificationCenter.default
             switch error {
             case StartMetaError.configMissing:
                 unc.postConfigErrorNotice(msg: "Can't find config.")
@@ -894,7 +922,7 @@ extension AppDelegate {
             PrivilegedHelperManager.shared.helper {
 				Logger.log("helperNotFound, startMeta failed", level: .error)
                 resolver.reject(StartMetaError.helperNotFound)
-            }?.startMeta(withConfPath: kConfigFolderPath,
+			}?.startMeta(confPath: kConfigFolderPath,
                          confFilePath: config.path,
 						 confJSON: confJSON) {
                 if let string = $0 {
