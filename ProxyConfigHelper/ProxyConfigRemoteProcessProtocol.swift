@@ -11,10 +11,7 @@ import Foundation
 protocol ProxyConfigRemoteProcessProtocol {
 	func getVersion(reply: @escaping (String) -> Void)
 	
-	
-	func initMetaCore(path: String)
-	func startMeta(confPath: String, confFilePath: String, confJSON: String, reply: @escaping (String?) -> Void)
-	func verifyMeta(confPath: String, confFilePath: String, reply: @escaping (String?) -> Void)
+	func startMeta(path: String, confPath: String, confFilePath: String, confJSON: String, reply: @escaping (String?) -> Void)
 	func stopMeta()
 	func updateTun(state: Bool)
 	func getUsedPorts(reply: @escaping (String?) -> Void)

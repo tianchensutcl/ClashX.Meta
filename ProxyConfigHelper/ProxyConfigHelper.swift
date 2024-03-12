@@ -110,22 +110,13 @@ extension ProxyConfigHelper: ProxyConfigRemoteProcessProtocol {
 		}
 	}
 	
-	func initMetaCore(path: String) {
+	func startMeta(path: String, 
+				   confPath: String,
+				   confFilePath: String,
+				   confJSON: String,
+				   reply: @escaping (String?) -> Void) {
 		DispatchQueue.main.async {
-			self.metaTask.setLaunchPath(path)
-		}
-	}
-	
-	func startMeta(confPath: String, confFilePath: String, confJSON: String, reply: @escaping (String?) -> Void) {
-		DispatchQueue.main.async {
-			self.metaTask.start(confPath, confFilePath: confFilePath, confJSON: confJSON, result: reply)
-		}
-	}
-	
-	func verifyMeta(confPath: String, confFilePath: String, reply: @escaping (String?) -> Void) {
-		DispatchQueue.main.async {
-			let re = self.metaTask.test(confPath, confFilePath: confFilePath)
-			reply(re)
+			self.metaTask.start(path, confPath: confPath, confFilePath: confFilePath, confJSON: confJSON, result: reply)
 		}
 	}
 	
