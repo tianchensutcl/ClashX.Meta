@@ -29,17 +29,20 @@ enum StartMetaError: Error {
 
 class ClashProcess: NSObject {
 	
-	enum CoreState {
-		case stopped, checkingHelper, helperReady, starting, running
+	enum CoreState: Int {
+		case stopped, startFailed, checkingHelper, helperReady, starting, running
 	}
 	
 	
 	private let md5: String
+	private var retryTimes = 0
 	
-	var _coreState: CoreState = .stopped
+	private var _coreState: CoreState = .stopped
+	
 	var coreState: CoreState {
 		return _coreState
 	}
+	
 	var delegate: ClashProcessDelegate?
 	
 	init(_ md5: String) {
@@ -89,37 +92,10 @@ class ClashProcess: NSObject {
 		}
 	}()
 	
+	
+// MARK: start core
+	
 	func start() {
-		
-		func checkHelperVersion() -> Promise<String?> {
-			guard coreState == .checkingHelper else {
-				return .value(nil)
-			}
-			return Promise { resolver in
-				PrivilegedHelperManager.shared.helper {
-					Logger.log("Helper, check status failed, will try again")
-					resolver.reject(StartMetaError.helperVersion)
-				}?.getVersion {
-					Logger.log("Helper, check status success \($0)")
-					resolver.fulfill($0)
-				}
-			}
-		}
-		
-		func startProxy() -> Promise<()> {
-			Promise { resolver in
-				self.startProxy {
-					if $0 {
-						Logger.log("Helper, start core failed, will try again")
-						resolver.reject(StartMetaError.helperStart)
-					} else {
-						Logger.log("Helper, start core success")
-						resolver.fulfill_()
-					}
-				}
-			}
-		}
-		
 		let paths = launchPath
 		
 		guard let _ = paths.path else {
@@ -128,38 +104,70 @@ class ClashProcess: NSObject {
 			return
 		}
 		
-		attempt(maximumRetryCount: 360,
-				delayBeforeRetry: .milliseconds(500)) {
-			checkHelperVersion()
-		}.then { _ in
-			self.attempt(maximumRetryCount: 30,
-					delayBeforeRetry: .seconds(2)) {
-				startProxy()
-			}
-		}.catch {
-			Logger.log("Helper, attempt error \($0)")
-		}
-		
-	}
-	
-	func attempt<T>(maximumRetryCount: Int = 3, delayBeforeRetry: DispatchTimeInterval = .seconds(2), _ body: @escaping () -> Promise<T>) -> Promise<T> {
-		var attempts = 0
-		func attempt() -> Promise<T> {
-			attempts += 1
-			return body().recover { error -> Promise<T> in
-				guard attempts < maximumRetryCount else { throw error }
-				return after(delayBeforeRetry).then(attempt)
-			}
-		}
-		return attempt()
-	}
-	
-	func startProxy(shouldRetry: ((Bool) -> Void)? = nil) {
-		if ConfigManager.shared.isRunning { return }
+		checkHelperVersion().then { _ in
+			self.startProxy()
+		}.done {
+			self.retryTimes = 0
+			Logger.log("Init config file success.")
+			
+			self.showUpdateNotification("ClashX_Meta_1.3.0_UpdateTips", info: "Config Floder migrated from\n~/.config/clash to\n~/.config/clash.meta")
+		}.catch { error in
+			Logger.log("\(error)", level: .error)
 
+			switch error {
+			case StartMetaError.helperNotFound:
+				self._coreState = .checkingHelper
+				let delay: DispatchTimeInterval = {
+					switch self.retryTimes {
+					case 0..<10:
+						return .milliseconds(500)
+					case 10..<20:
+						return .seconds(2)
+					case 20..<30:
+						return .seconds(8)
+					case 30..<40:
+						return .seconds(15)
+					default:
+						return .seconds(60)
+					}
+				}()
+				self.retryTimes += 1
+				after(delay).done {
+					self.start()
+				}
+			default:
+				self._coreState = .startFailed
+				self.delegate?.clashStartError(error)
+			}
+		}
+	}
+	
+	func checkHelperVersion() -> Promise<String?> {
+		guard coreState.rawValue < CoreState.helperReady.rawValue else {
+			return .value(nil)
+		}
+		_coreState = .checkingHelper
+		return Promise { resolver in
+			PrivilegedHelperManager.shared.helper {
+				Logger.log("Helper, check status failed, will try again")
+				resolver.reject(StartMetaError.helperVersion)
+			}?.getVersion {
+				Logger.log("Helper, check status success \($0)")
+				self._coreState = .helperReady
+				resolver.fulfill($0)
+			}
+		}
+	}
+	
+	private func startProxy() -> Promise<()> {
+		guard coreState.rawValue < CoreState.starting.rawValue else {
+			return .value(())
+		}
+		_coreState = .starting
+		
 		Logger.log("Trying start meta core")
 		
-		prepareConfigFile().then {
+		return prepareConfigFile().then {
 			self.generateInitConfig()
 		}.then {
 			self.startMeta($0)
@@ -171,34 +179,13 @@ class ClashProcess: NSObject {
 ########  END  #########
 """, level: .info)
 			}
-
+			self._coreState = .running
 			self.delegate?.clashApiUpdated(res)
-			
-			shouldRetry?(false)
 		}.then { _ in
 			self.pushInitConfig()
-		}.done {
-			Logger.log("Init config file success.")
-			
-			self.showUpdateNotification("ClashX_Meta_1.3.0_UpdateTips", info: "Config Floder migrated from\n~/.config/clash to\n~/.config/clash.meta")
-		}.catch { error in
-			Logger.log("\(error)", level: .error)
-
-			self.delegate?.clashStartError(error)
-			
-			switch error {
-			case StartMetaError.helperNotFound:
-				shouldRetry?(true)
-				if shouldRetry != nil {
-					return
-				}
-			default:
-				shouldRetry?(false)
-			}
-			
-
 		}
 	}
+	
 
 	func prepareConfigFile() -> Promise<()> {
 		.init { resolver in

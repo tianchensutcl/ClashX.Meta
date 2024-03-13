@@ -559,7 +559,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 extension AppDelegate: ClashProcessDelegate {
 	
 	func startProxyCore() {
-		guard clashProcess.coreState != .running,
+		guard clashProcess.coreState == .stopped,
 			  !ConfigManager.shared.isRunning else { return }
 		
 		clashProcess.delegate = self
