@@ -16,9 +16,6 @@ protocol ClashProcessDelegate {
 }
 
 enum StartMetaError: Error {
-	case helperVersion
-	case helperStart
-	
 	case configMissing
 	case remoteConfigMissing
 	case startMetaFailed(String)
@@ -150,7 +147,7 @@ class ClashProcess: NSObject {
 		return Promise { resolver in
 			PrivilegedHelperManager.shared.helper {
 				Logger.log("Helper, check status failed, will try again")
-				resolver.reject(StartMetaError.helperVersion)
+				resolver.reject(StartMetaError.helperNotFound)
 			}?.getVersion {
 				Logger.log("Helper, check status success \($0)")
 				self._coreState = .helperReady
