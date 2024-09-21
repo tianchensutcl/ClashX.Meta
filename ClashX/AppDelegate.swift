@@ -442,7 +442,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 return
             }
 
-			PrivilegedHelperManager.shared.helper()?.updateTun(state: enable)
+			PrivilegedHelperManager.shared.helper()?.updateTun(state: enable, dns: ConfigManager.metaTunDNS)
             Logger.log("tun state updated, new: \(enable)")
         }
     }
@@ -578,7 +578,7 @@ extension AppDelegate: ClashProcessDelegate {
 		
 		if ConfigManager.shared.restoreTunProxy {
 			ApiRequest.updateTun(enable: true) {
-				PrivilegedHelperManager.shared.helper()?.updateTun(state: true)
+				PrivilegedHelperManager.shared.helper()?.updateTun(state: true, dns: ConfigManager.metaTunDNS)
 			}
 		} else {
 			syncConfigWithTun(true)
@@ -755,7 +755,7 @@ extension AppDelegate: ApiRequestStreamDelegate {
     }
 
     func didGetLog(log: String, level: String) {
-        Logger.log(log, level: ClashLogLevel(rawValue: level) ?? .unknow)
+//        Logger.log(log, level: ClashLogLevel(rawValue: level) ?? .unknow)
     }
 }
 

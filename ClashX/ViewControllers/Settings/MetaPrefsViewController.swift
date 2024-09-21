@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import Network
 
 class MetaPrefsViewController: NSViewController {
 	// Meta Setting
@@ -28,6 +29,14 @@ class MetaPrefsViewController: NSViewController {
 		MenuItemFactory.hideUnselectable = newState.rawValue
 	}
 	
+	@IBOutlet var tunDNSTextField: NSTextField!
+	@IBAction func tunDNSChanged(_ sender: NSTextField) {
+		let ds = sender.stringValue
+		guard let _ = IPv4Address(ds) else { return }
+		ConfigManager.metaTunDNS = ds
+		updateNeedsRestart()
+	}
+	
 	// Dashboard
 	@IBOutlet var useSwiftuiButton: NSButton!
 	@IBOutlet var useYacdButton: NSButton!
@@ -47,6 +56,7 @@ class MetaPrefsViewController: NSViewController {
 			break
 		}
 		initDashboardButtons()
+		updateNeedsRestart()
 	}
 	
 	// Alpha Core
@@ -71,6 +81,7 @@ class MetaPrefsViewController: NSViewController {
 
 		let use = sender.state == .on
 		ConfigManager.useAlphaCore = use
+		updateNeedsRestart()
 	}
 	
 	@IBAction func updateAlpha(_ sender: NSButton) {
@@ -104,10 +115,20 @@ class MetaPrefsViewController: NSViewController {
 	}
 	
 	
+	@IBOutlet var restartTextField: NSTextField!
+	
+	var prefsSnapshot = [String]()
+	var versionSnapshot = "none"
+	var alphaCoreUpdated = false
+	
 	override func viewDidLoad() {
         super.viewDidLoad()
 		// Meta Setting
 		hideUnselectableButton.state = .init(rawValue: MenuItemFactory.hideUnselectable)
+		
+		tunDNSTextField.placeholderString = ConfigManager.defaultTunDNS
+		tunDNSTextField.stringValue = ConfigManager.metaTunDNS
+		tunDNSTextField.delegate = self
 		
 		// Dashboard
 		initDashboardButtons()
@@ -116,6 +137,11 @@ class MetaPrefsViewController: NSViewController {
 		useAlphaButton.state = ConfigManager.useAlphaCore ? .on : .off
 		updateProgressIndicator.isHidden = true
 		setAlphaVersion()
+		
+		// Snapshot
+		prefsSnapshot = takePrefsSnapshot()
+		versionSnapshot = alphaVersionTextField.stringValue
+		restartTextField.isHidden = true
     }
 	
 	func initDashboardButtons() {
@@ -156,6 +182,31 @@ class MetaPrefsViewController: NSViewController {
 			alphaVersionTextField.stringValue = "none"
 			updateButton.title = NSLocalizedString("Download Meta core", comment: "")
 		}
+		
+		if let v = version,
+		   versionSnapshot != "none",
+		   v != versionSnapshot {
+			alphaCoreUpdated = true
+			updateNeedsRestart()
+		}
 	}
 	
+	func takePrefsSnapshot() -> [String] {
+		[
+			ConfigManager.metaTunDNS,
+			"\(ConfigManager.useYacdDashboard)",
+			"\(ConfigManager.useAlphaCore)"
+		]
+	}
+	
+	func updateNeedsRestart() {
+		let needsRestart = prefsSnapshot != takePrefsSnapshot() || alphaCoreUpdated
+		restartTextField.isHidden = !needsRestart
+	}
+}
+
+extension MetaPrefsViewController: NSTextFieldDelegate {
+	func control(_ control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {
+		IPv4Address(fieldEditor.string) != nil
+	}
 }
