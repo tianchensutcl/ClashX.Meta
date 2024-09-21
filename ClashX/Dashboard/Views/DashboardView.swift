@@ -18,15 +18,9 @@ struct DashboardView: View {
 	
 	var body: some View {
 		Group {
-			if !isRunning {
-				APISettingView()
-
-//					.presentedWindowToolbarStyle(.expanded)
-			} else {
-				NavigationView {
-					SidebarView()
-					EmptyView()
-				}
+			NavigationView {
+				SidebarView()
+				EmptyView()
 			}
 		}
 		.onReceive(runningState) { _ in

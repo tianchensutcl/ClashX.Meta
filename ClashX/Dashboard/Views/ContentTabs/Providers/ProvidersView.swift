@@ -65,7 +65,7 @@ struct ProvidersView: View {
 				}
 			}
 		}
-		.introspect(.table, on: .macOS(.v12, .v13, .v14)) {
+		.introspect(.table, on: .macOS(.v12, .v13, .v14, .v15)) {
 			$0.refusesFirstResponder = true
 			$0.doubleAction = nil
 		}

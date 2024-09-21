@@ -26,7 +26,7 @@ struct ProxiesView: View {
 			List(proxyStorage.groups, id: \.id) { group in
 				ProxyGroupRowView(proxyGroup: group)
 			}
-			.introspect(.table, on: .macOS(.v12, .v13, .v14)) {
+			.introspect(.table, on: .macOS(.v12, .v13, .v14, .v15)) {
 				$0.refusesFirstResponder = true
 				$0.doubleAction = nil
 			}
