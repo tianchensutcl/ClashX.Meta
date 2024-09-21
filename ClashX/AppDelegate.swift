@@ -750,12 +750,20 @@ extension AppDelegate {
 // MARK: Streaming Info
 
 extension AppDelegate: ApiRequestStreamDelegate {
+	func didUpdateMemory(memory: Int64) {
+		
+	}
+	
+	func streamStatusChanged() {
+		
+	}
+	
     func didUpdateTraffic(up: Int, down: Int) {
         statusItemView.updateSpeedLabel(up: up, down: down)
     }
 
     func didGetLog(log: String, level: String) {
-//        Logger.log(log, level: ClashLogLevel(rawValue: level) ?? .unknow)
+        Logger.log(log, level: ClashLogLevel(rawValue: level) ?? .unknow)
     }
 }
 

@@ -39,6 +39,7 @@ class ConfigManager {
 
         set {
             isRunningVariable.accept(newValue)
+			NotificationCenter.default.post(.init(name: .init("ClashRunningStateChanged")))
         }
     }
 

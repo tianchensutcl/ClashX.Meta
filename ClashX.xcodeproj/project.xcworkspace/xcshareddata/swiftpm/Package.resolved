@@ -1,5 +1,5 @@
 {
-  "originHash" : "04a3b3bc2bf53686240dbd5a590ed7d847103b4a63a3a4cb1892d2b9b92e3a52",
+  "originHash" : "79f29dc60a8a95688aa73c0cce32f5496ed9744c56a5d38efc20f94aacd73360",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -8,15 +8,6 @@
       "state" : {
         "revision" : "f455c2975872ccd2d9c81594c658af65716e9b9a",
         "version" : "5.9.1"
-      }
-    },
-    {
-      "identity" : "clashx-dashboard",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mrFq1/ClashX-Dashboard",
-      "state" : {
-        "branch" : "dev",
-        "revision" : "19da905b9261e7c47c5e36d697c466fc2fb76158"
       }
     },
     {
