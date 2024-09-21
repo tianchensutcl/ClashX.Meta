@@ -34,6 +34,7 @@ class MetaPrefsViewController: NSViewController {
 		let ds = sender.stringValue
 		guard let _ = IPv4Address(ds) else { return }
 		ConfigManager.metaTunDNS = ds
+		updateNeedsRestart()
 	}
 	
 	// Dashboard
@@ -55,6 +56,7 @@ class MetaPrefsViewController: NSViewController {
 			break
 		}
 		initDashboardButtons()
+		updateNeedsRestart()
 	}
 	
 	// Alpha Core
@@ -79,6 +81,7 @@ class MetaPrefsViewController: NSViewController {
 
 		let use = sender.state == .on
 		ConfigManager.useAlphaCore = use
+		updateNeedsRestart()
 	}
 	
 	@IBAction func updateAlpha(_ sender: NSButton) {
@@ -112,6 +115,12 @@ class MetaPrefsViewController: NSViewController {
 	}
 	
 	
+	@IBOutlet var restartTextField: NSTextField!
+	
+	var prefsSnapshot = [String]()
+	var versionSnapshot = "none"
+	var alphaCoreUpdated = false
+	
 	override func viewDidLoad() {
         super.viewDidLoad()
 		// Meta Setting
@@ -128,6 +137,11 @@ class MetaPrefsViewController: NSViewController {
 		useAlphaButton.state = ConfigManager.useAlphaCore ? .on : .off
 		updateProgressIndicator.isHidden = true
 		setAlphaVersion()
+		
+		// Snapshot
+		prefsSnapshot = takePrefsSnapshot()
+		versionSnapshot = alphaVersionTextField.stringValue
+		restartTextField.isHidden = true
     }
 	
 	func initDashboardButtons() {
@@ -168,8 +182,27 @@ class MetaPrefsViewController: NSViewController {
 			alphaVersionTextField.stringValue = "none"
 			updateButton.title = NSLocalizedString("Download Meta core", comment: "")
 		}
+		
+		if let v = version,
+		   versionSnapshot != "none",
+		   v != versionSnapshot {
+			alphaCoreUpdated = true
+			updateNeedsRestart()
+		}
 	}
 	
+	func takePrefsSnapshot() -> [String] {
+		[
+			ConfigManager.metaTunDNS,
+			"\(ConfigManager.useYacdDashboard)",
+			"\(ConfigManager.useAlphaCore)"
+		]
+	}
+	
+	func updateNeedsRestart() {
+		let needsRestart = prefsSnapshot != takePrefsSnapshot() || alphaCoreUpdated
+		restartTextField.isHidden = !needsRestart
+	}
 }
 
 extension MetaPrefsViewController: NSTextFieldDelegate {

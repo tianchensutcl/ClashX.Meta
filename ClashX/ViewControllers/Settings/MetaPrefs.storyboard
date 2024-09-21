@@ -10,14 +10,14 @@
             <objects>
                 <viewController id="bU7-R8-ocO" customClass="MetaPrefsViewController" customModule="ClashX_Meta" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" misplaced="YES" id="tOy-S4-hL0">
-                        <rect key="frame" x="0.0" y="0.0" width="472" height="397"/>
+                        <rect key="frame" x="0.0" y="0.0" width="472" height="432"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0gk-BB-Gdf">
-                                <rect key="frame" x="20" y="20" width="432" height="357"/>
+                                <rect key="frame" x="20" y="20" width="432" height="393"/>
                                 <subviews>
                                     <box borderType="line" title="Meta Setting" translatesAutoresizingMaskIntoConstraints="NO" id="Lcd-RJ-vG1">
-                                        <rect key="frame" x="-3" y="242" width="438" height="115"/>
+                                        <rect key="frame" x="-3" y="278" width="438" height="115"/>
                                         <view key="contentView" id="U05-m1-3dj">
                                             <rect key="frame" x="4" y="5" width="430" height="95"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -99,7 +99,7 @@
                                         </view>
                                     </box>
                                     <box borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="KHD-s8-L0n">
-                                        <rect key="frame" x="-3" y="128" width="438" height="100"/>
+                                        <rect key="frame" x="-3" y="164" width="438" height="100"/>
                                         <view key="contentView" id="ZgJ-Un-cAG">
                                             <rect key="frame" x="4" y="5" width="430" height="92"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -176,7 +176,7 @@
                                         </view>
                                     </box>
                                     <box borderType="line" title="Alpha Core" translatesAutoresizingMaskIntoConstraints="NO" id="jTG-JZ-aJa">
-                                        <rect key="frame" x="-3" y="-4" width="438" height="116"/>
+                                        <rect key="frame" x="-3" y="32" width="438" height="116"/>
                                         <view key="contentView" id="Xn6-sq-HY0">
                                             <rect key="frame" x="4" y="5" width="430" height="96"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -277,6 +277,14 @@
                                             </constraints>
                                         </view>
                                     </box>
+                                    <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TTD-4f-gyL">
+                                        <rect key="frame" x="18" y="0.0" width="396" height="16"/>
+                                        <textFieldCell key="cell" lineBreakMode="clipping" title="Requires restart ClashX Meta to take effect." id="wIw-Pj-t2i">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="KHD-s8-L0n" firstAttribute="leading" secondItem="0gk-BB-Gdf" secondAttribute="leading" id="6Ox-4d-pKO"/>
@@ -285,13 +293,17 @@
                                     <constraint firstItem="Lcd-RJ-vG1" firstAttribute="leading" secondItem="0gk-BB-Gdf" secondAttribute="leading" id="IT4-8w-3dS"/>
                                     <constraint firstAttribute="trailing" secondItem="jTG-JZ-aJa" secondAttribute="trailing" id="Sws-G0-fci"/>
                                     <constraint firstItem="jTG-JZ-aJa" firstAttribute="leading" secondItem="0gk-BB-Gdf" secondAttribute="leading" id="Vka-wv-da2"/>
+                                    <constraint firstAttribute="trailing" secondItem="TTD-4f-gyL" secondAttribute="trailing" constant="20" id="h6f-oT-QRr"/>
+                                    <constraint firstItem="TTD-4f-gyL" firstAttribute="leading" secondItem="0gk-BB-Gdf" secondAttribute="leading" constant="20" id="hwO-If-HLk"/>
                                 </constraints>
                                 <visibilityPriorities>
                                     <real value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
+                                    <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -308,6 +320,7 @@
                     <connections>
                         <outlet property="alphaVersionTextField" destination="yKt-RT-uZL" id="A2m-kO-WMQ"/>
                         <outlet property="hideUnselectableButton" destination="Wig-IX-1hV" id="9dI-B3-Tbe"/>
+                        <outlet property="restartTextField" destination="TTD-4f-gyL" id="gDw-gY-aSm"/>
                         <outlet property="showAlphaButton" destination="UWj-Su-skJ" id="v29-ZT-4mA"/>
                         <outlet property="tunDNSTextField" destination="YuJ-wO-puO" id="4xw-eF-vnz"/>
                         <outlet property="updateButton" destination="SRr-f9-XRY" id="suh-eD-eh8"/>
