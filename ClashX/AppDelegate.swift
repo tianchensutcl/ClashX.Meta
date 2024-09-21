@@ -21,7 +21,6 @@ private let MetaCoreMd5 = "WOSHIZIDONGSHENGCHENGDEA"
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
     private(set) var statusItem: NSStatusItem!
-    @IBOutlet var checkForUpdateMenuItem: NSMenuItem!
 
     @IBOutlet var statusMenu: NSMenu!
     @IBOutlet var proxySettingMenuItem: NSMenuItem!
@@ -116,8 +115,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if WebPortalManager.hasWebProtal {
             WebPortalManager.shared.addWebProtalMenuItem(&statusMenu)
         }
-        AutoUpgardeManager.shared.setup()
-        AutoUpgardeManager.shared.setupCheckForUpdatesMenuItem(checkForUpdateMenuItem)
+		
         // install proxy helper
         _ = ClashResourceManager.check()
         PrivilegedHelperManager.shared.checkInstall()
@@ -828,30 +826,6 @@ extension AppDelegate {
             self.syncConfigWithTun {
 				self.tunModeMenuItem.state = enable ? .on : .off
 				self.tunModeMenuItem.isEnabled = true
-            }
-        }
-    }
-
-    @IBAction func checkForUpdate(_ sender: NSMenuItem) {
-        let unc = NSUserNotificationCenter.default
-        AF.request("https://api.github.com/repos/MetaCubeX/ClashX.Meta/releases/latest").responseString {
-            guard $0.error == nil,
-                  let data = $0.data,
-                  let tagName = try? JSON(data: data)["tag_name"].string else {
-                unc.postUpdateNotice(msg: NSLocalizedString("Some thing failed.", comment: ""))
-                return
-            }
-
-            if tagName != AppVersionUtil.currentVersion {
-                let alert = NSAlert()
-                alert.messageText = NSLocalizedString("Open github release page to download ", comment: "") + "\(tagName)"
-                alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
-                alert.addButton(withTitle: NSLocalizedString("Cancel", comment: ""))
-                if alert.runModal() == .alertFirstButtonReturn {
-                    NSWorkspace.shared.open(.init(string: "https://github.com/MetaCubeX/ClashX.Meta/releases/latest")!)
-                }
-            } else {
-                unc.postUpdateNotice(msg: NSLocalizedString("No new release found.", comment: ""))
             }
         }
     }
