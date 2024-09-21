@@ -132,8 +132,9 @@ extension ProxyConfigHelper: ProxyConfigRemoteProcessProtocol {
 		}
 	}
 	
-	func updateTun(state: Bool) {
+	func updateTun(state: Bool, dns: String) {
 		DispatchQueue.main.async {
+			self.metaDNS.setCustomDNS(dns)
 			if state {
 				self.metaDNS.updateDns()
 			} else {

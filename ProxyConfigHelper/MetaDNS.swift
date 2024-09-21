@@ -10,10 +10,10 @@ import SystemConfiguration
 // https://github.com/zhuhaow/Specht2/blob/main/app/me.zhuhaow.Specht2.proxy-helper/ProxyHelper.swift
 
 class MetaDNS: NSObject {
-    
+	private var customDNS = "8.8.8.8"
+	
+	static let savedDnsKey = "SavedSystemDNSs"
     var savedDns = [String: [String]]()
-    let defaultDNS = "198.18.0.2"
-    
     let authRef: AuthorizationRef
 
     override init() {
@@ -29,7 +29,13 @@ class MetaDNS: NSObject {
         if auth == nil {
             NSLog("Error: No authorization has been granted to modify network configuration.")
         }
-
+		
+		
+		if let data = UserDefaults.standard.data(forKey: MetaDNS.savedDnsKey),
+		   let saved = try? JSONDecoder().decode([String: [String]].self, from: data) {
+			self.savedDns = saved
+		}
+		
         authRef = auth!
 
         super.init()
@@ -39,23 +45,34 @@ class MetaDNS: NSObject {
         AuthorizationFree(authRef, AuthorizationFlags())
     }
     
+	@objc func setCustomDNS(_ dns: String) {
+		customDNS = dns
+	}
+	
     @objc func updateDns() {
-        let dns = getAllDns()
-        dns.forEach {
-            if $0.value.count == 1,
-               $0.value[0] == defaultDNS {
-                if savedDns[$0.key] == nil {
-                    savedDns[$0.key] = []
-                } else {
-                    // ignore save
-                }
-            } else {
-                savedDns[$0.key] = $0.value
-            }
-        }
+		let dns = getAllDns()
+		
+		if savedDns.isEmpty {
+			dns.forEach {
+				if $0.value.count == 1,
+				   $0.value[0] == customDNS {
+					if savedDns[$0.key] == nil {
+						savedDns[$0.key] = []
+					} else {
+						// ignore save
+					}
+				} else {
+					savedDns[$0.key] = $0.value
+				}
+			}
+			if !savedDns.isEmpty,
+				let data = try? JSONEncoder().encode(savedDns) {
+				UserDefaults.standard.set(data, forKey: MetaDNS.savedDnsKey)
+			}
+		}
         
         let dnsDic = dns.reduce(into: [:]) {
-            $0[$1.key] = [defaultDNS]
+            $0[$1.key] = [customDNS]
         }
         
         updateDNSConfigure(dnsDic)
@@ -64,6 +81,7 @@ class MetaDNS: NSObject {
     @objc func revertDns() {
         updateDNSConfigure(savedDns)
         savedDns.removeAll()
+		UserDefaults.standard.removeObject(forKey: MetaDNS.savedDnsKey)
     }
     
     func getAllDns() -> [String: [String]] {

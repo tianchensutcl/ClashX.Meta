@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import Network
 
 class MetaPrefsViewController: NSViewController {
 	// Meta Setting
@@ -26,6 +27,13 @@ class MetaPrefsViewController: NSViewController {
 
 		sender.state = newState
 		MenuItemFactory.hideUnselectable = newState.rawValue
+	}
+	
+	@IBOutlet var tunDNSTextField: NSTextField!
+	@IBAction func tunDNSChanged(_ sender: NSTextField) {
+		let ds = sender.stringValue
+		guard let _ = IPv4Address(ds) else { return }
+		ConfigManager.metaTunDNS = ds
 	}
 	
 	// Dashboard
@@ -109,6 +117,10 @@ class MetaPrefsViewController: NSViewController {
 		// Meta Setting
 		hideUnselectableButton.state = .init(rawValue: MenuItemFactory.hideUnselectable)
 		
+		tunDNSTextField.placeholderString = ConfigManager.defaultTunDNS
+		tunDNSTextField.stringValue = ConfigManager.metaTunDNS
+		tunDNSTextField.delegate = self
+		
 		// Dashboard
 		initDashboardButtons()
 		
@@ -158,4 +170,10 @@ class MetaPrefsViewController: NSViewController {
 		}
 	}
 	
+}
+
+extension MetaPrefsViewController: NSTextFieldDelegate {
+	func control(_ control: NSControl, textShouldEndEditing fieldEditor: NSText) -> Bool {
+		IPv4Address(fieldEditor.string) != nil
+	}
 }
