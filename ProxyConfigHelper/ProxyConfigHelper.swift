@@ -136,9 +136,9 @@ extension ProxyConfigHelper: ProxyConfigRemoteProcessProtocol {
 		DispatchQueue.main.async {
 			self.metaDNS.setCustomDNS(dns)
 			if state {
-				self.metaDNS.updateDns()
+				self.metaDNS.hijackDNS()
 			} else {
-				self.metaDNS.revertDns()
+				self.metaDNS.revertDNS()
 			}
 			self.metaDNS.flushDnsCache()
 		}

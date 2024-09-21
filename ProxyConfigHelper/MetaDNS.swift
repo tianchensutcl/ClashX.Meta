@@ -12,8 +12,8 @@ import SystemConfiguration
 class MetaDNS: NSObject {
 	private var customDNS = "8.8.8.8"
 	
-	static let savedDnsKey = "SavedSystemDNSs"
-    var savedDns = [String: [String]]()
+	static let savedDNSKey = "ProxyConfigHelper.SavedSystemDNSs"
+    var savedDNS = [String: [String]]()
     let authRef: AuthorizationRef
 
     override init() {
@@ -31,9 +31,9 @@ class MetaDNS: NSObject {
         }
 		
 		
-		if let data = UserDefaults.standard.data(forKey: MetaDNS.savedDnsKey),
+		if let data = UserDefaults.standard.data(forKey: MetaDNS.savedDNSKey),
 		   let saved = try? JSONDecoder().decode([String: [String]].self, from: data) {
-			self.savedDns = saved
+			self.savedDNS = saved
 		}
 		
         authRef = auth!
@@ -49,28 +49,19 @@ class MetaDNS: NSObject {
 		customDNS = dns
 	}
 	
-    @objc func updateDns() {
+    @objc func hijackDNS() {
 		let dns = getAllDns()
-		
-		if savedDns.isEmpty {
-			dns.forEach {
-				if $0.value.count == 1,
-				   $0.value[0] == customDNS {
-					if savedDns[$0.key] == nil {
-						savedDns[$0.key] = []
-					} else {
-						// ignore save
-					}
-				} else {
-					savedDns[$0.key] = $0.value
-				}
-			}
-			if !savedDns.isEmpty,
-				let data = try? JSONEncoder().encode(savedDns) {
-				UserDefaults.standard.set(data, forKey: MetaDNS.savedDnsKey)
-			}
+		let hijacked = dns.allSatisfy {
+			$0.value.count == 1 && $0.value[0] == customDNS
 		}
-        
+		 
+		guard !hijacked else { return }
+		
+		savedDNS = dns
+		if let data = try? JSONEncoder().encode(savedDNS) {
+			UserDefaults.standard.set(data, forKey: MetaDNS.savedDNSKey)
+		}
+
         let dnsDic = dns.reduce(into: [:]) {
             $0[$1.key] = [customDNS]
         }
@@ -78,10 +69,11 @@ class MetaDNS: NSObject {
         updateDNSConfigure(dnsDic)
     }
     
-    @objc func revertDns() {
-        updateDNSConfigure(savedDns)
-        savedDns.removeAll()
-		UserDefaults.standard.removeObject(forKey: MetaDNS.savedDnsKey)
+    @objc func revertDNS() {
+		guard savedDNS.count > 0 else { return }
+        updateDNSConfigure(savedDNS)
+        savedDNS.removeAll()
+		UserDefaults.standard.removeObject(forKey: MetaDNS.savedDNSKey)
     }
     
     func getAllDns() -> [String: [String]] {
