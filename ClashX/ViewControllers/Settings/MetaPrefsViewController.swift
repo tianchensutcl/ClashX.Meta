@@ -44,10 +44,8 @@ class MetaPrefsViewController: NSViewController {
 	
 	@IBAction func switchDashboard(_ sender: NSButton) {
 		switch sender {
-#if SwiftUI_Version
 		case useSwiftuiButton:
 			DashboardManager.shared.useSwiftUI = sender.state == .on
-#endif
 		case useYacdButton:
 			ConfigManager.useYacdDashboard = sender.state == .on
 		case useXDButton:
@@ -152,11 +150,8 @@ class MetaPrefsViewController: NSViewController {
 		useYacdButton.state = useYacd ? .on : .off
 		useXDButton.state = useYacd ? .off : .on
 		
-#if SwiftUI_Version
+		
 		useSwiftuiButton.isEnabled = true
-#else
-		useSwiftuiButton.isEnabled = false
-#endif
 		useYacdButton.isEnabled = !useSwiftUI
 		useXDButton.isEnabled = !useSwiftUI
 	}
