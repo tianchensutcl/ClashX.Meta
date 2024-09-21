@@ -267,7 +267,6 @@
 		01BCDB1C2C9EE2CF0028FA94 /* ProgressButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressButton.swift; sourceTree = "<group>"; };
 		01C1462928962E4E00346AF3 /* com.metacubex.ClashX.ProxyConfigHelper.meta.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = com.metacubex.ClashX.ProxyConfigHelper.meta.gz; sourceTree = "<group>"; };
 		01CA6BBF2B6A1B3100E386D6 /* MetaServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetaServer.swift; sourceTree = "<group>"; };
-		01D567DF2AD1562700CDA0AE /* ClashX Meta SwiftUI-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ClashX Meta SwiftUI-Info.plist"; sourceTree = "<group>"; };
 		01D567E12AD158B500CDA0AE /* MetaPrefs.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MetaPrefs.storyboard; sourceTree = "<group>"; };
 		01D567E22AD158B500CDA0AE /* MetaPrefsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetaPrefsViewController.swift; sourceTree = "<group>"; };
 		01E33AB129B5BF4200FD1006 /* NSColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSColor+Extension.swift"; sourceTree = "<group>"; };
@@ -803,7 +802,6 @@
 				49CF3B2020CD7463001EBF94 /* AppDelegate.swift */,
 				49CF3B2620CD7465001EBF94 /* Main.storyboard */,
 				49CF3B2920CD7465001EBF94 /* Info.plist */,
-				01D567DF2AD1562700CDA0AE /* ClashX Meta SwiftUI-Info.plist */,
 				49CF3B2A20CD7465001EBF94 /* ClashX.entitlements */,
 				49CF3B3520CD75DF001EBF94 /* ClashX-Bridging-Header.h */,
 				F9FAB31D262BE04800DE02A6 /* Images.xcassets */,
@@ -1209,7 +1207,7 @@
 					"$(PROJECT_DIR)/ClashX/Support\\ Files",
 					"$(PROJECT_DIR)/ClashX/Support\\ Files",
 				);
-				INFOPLIST_FILE = "ClashX/ClashX Meta SwiftUI-Info.plist";
+				INFOPLIST_FILE = ClashX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -1256,7 +1254,7 @@
 					"$(PROJECT_DIR)/ClashX/Support\\ Files",
 					"$(PROJECT_DIR)/ClashX/Support\\ Files",
 				);
-				INFOPLIST_FILE = "ClashX/ClashX Meta SwiftUI-Info.plist";
+				INFOPLIST_FILE = ClashX/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
