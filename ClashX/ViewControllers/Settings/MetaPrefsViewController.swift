@@ -95,14 +95,14 @@ class MetaPrefsViewController: NSViewController {
 		}.done {
 			self.updateAlphaVersion($0)
 			let msg = NSLocalizedString("Version: ", comment: "") + $0
-			NSUserNotificationCenter.default.post(title: "Clash Meta Core", info: msg)
+			UserNotificationCenter.shared.post(title: "Clash Meta Core", info: msg)
 		}.ensure {
 			sender.isEnabled = true
 			self.updateProgressIndicator.isHidden = true
 			self.updateProgressIndicator.stopAnimation(nil)
 		}.catch {
 			let error = $0 as? AlphaMetaDownloader.errors
-			NSUserNotificationCenter.default.post(title: "Clash Meta Core", info: error?.des() ?? "")
+			UserNotificationCenter.shared.post(title: "Clash Meta Core", info: error?.des() ?? "")
 		}
 	}
 	

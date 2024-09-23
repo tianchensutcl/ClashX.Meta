@@ -120,7 +120,7 @@ class ApiRequest {
                 completeHandler(config)
             case let .failure(err):
                 Logger.log(err.localizedDescription)
-                NSUserNotificationCenter.default.post(title: "Error", info: err.localizedDescription)
+				UserNotificationCenter.shared.post(title: "Error", info: err.localizedDescription)
             }
         }
     }
