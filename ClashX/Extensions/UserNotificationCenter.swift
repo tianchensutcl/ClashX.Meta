@@ -31,7 +31,7 @@ class UserNotificationCenter: NSObject {
 				case .authorized, .provisional:
 					postNotification(title: title, info: info, identifier: identifier)
 				case .notDetermined:
-					let granted = try await notificationCenter.requestAuthorization(options: [.alert, .badge])
+					let granted = try await notificationCenter.requestAuthorization(options: [.alert, .badge, .sound])
 					
 					if granted {
 						postNotification(title: title, info: info, identifier: identifier)
@@ -144,7 +144,7 @@ extension UserNotificationCenter: UNUserNotificationCenterDelegate {
 	}
 	
 	func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-		[.banner, .badge, .list]
+		[.banner, .sound]
 	}
 	
 	func handleNotificationActive(with identifier: String) {
