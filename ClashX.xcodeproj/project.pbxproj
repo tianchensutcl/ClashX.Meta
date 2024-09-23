@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0106179F2AF38EFA005C7877 /* Command.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49FEC6682AD9369C00BAD9F5 /* Command.swift */; };
 		0162E74F2864B819007218A6 /* MetaTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0162E74E2864B819007218A6 /* MetaTask.swift */; };
+		0197255C2CA15FC600C14E49 /* NSWorkspace+openFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0197255B2CA15FC600C14E49 /* NSWorkspace+openFile.swift */; };
 		019A239628657A7A00AE5698 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 019A239528657A7A00AE5698 /* main.swift */; };
 		01BC9ABE2928EB5A00F9B177 /* MetaDNS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BC9ABD2928E5C600F9B177 /* MetaDNS.swift */; };
 		01BCDAAC2C9ECB3A0028FA94 /* DSFSparkline in Frameworks */ = {isa = PBXBuildFile; productRef = 01BCDAAB2C9ECB3A0028FA94 /* DSFSparkline */; };
@@ -219,6 +220,7 @@
 		016BEAAF29D80102001586C5 /* AlphaMetaDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlphaMetaDownloader.swift; sourceTree = "<group>"; };
 		018F88F8286DD0CB004DD0F7 /* DualTitleMenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DualTitleMenuItem.swift; sourceTree = "<group>"; };
 		01943258287D19BC008CC51A /* ClashRuleProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClashRuleProvider.swift; sourceTree = "<group>"; };
+		0197255B2CA15FC600C14E49 /* NSWorkspace+openFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSWorkspace+openFile.swift"; sourceTree = "<group>"; };
 		019A239528657A7A00AE5698 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		01B009AC2854533200B93618 /* geoip.dat.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = geoip.dat.gz; sourceTree = "<group>"; };
 		01B009AD2854533300B93618 /* geosite.dat.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = geosite.dat.gz; sourceTree = "<group>"; };
@@ -582,6 +584,7 @@
 				F9E8F34523A12B89002DE5E8 /* String+Encode.swift */,
 				F939724D23A4DB0600FE5A3F /* DateFormatter+.swift */,
 				01E33AB129B5BF4200FD1006 /* NSColor+Extension.swift */,
+				0197255B2CA15FC600C14E49 /* NSWorkspace+openFile.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1043,6 +1046,7 @@
 				01F335EF2AD10D0B0048AF77 /* RemoteConfigUpdateIntervalSettingView.swift in Sources */,
 				01F335F02AD10D0B0048AF77 /* AppDelegate+..swift in Sources */,
 				01F335F12AD10D0B0048AF77 /* NSView+Nib.swift in Sources */,
+				0197255C2CA15FC600C14E49 /* NSWorkspace+openFile.swift in Sources */,
 				01F335F22AD10D0B0048AF77 /* ProxyDelayHistoryMenu.swift in Sources */,
 				01F335F32AD10D0B0048AF77 /* NSColor+Extension.swift in Sources */,
 				01F335F42AD10D0B0048AF77 /* ClashConfig.swift in Sources */,

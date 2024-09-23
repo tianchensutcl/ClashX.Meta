@@ -769,7 +769,7 @@ extension AppDelegate: ApiRequestStreamDelegate {
 
 extension AppDelegate {
     @IBAction func actionShowLog(_ sender: Any?) {
-        NSWorkspace.shared.openFile(Logger.shared.logFilePath())
+        NSWorkspace.shared.openFilePath(Logger.shared.logFilePath())
     }
 }
 
@@ -785,7 +785,7 @@ extension AppDelegate {
                 }
             }
         } else {
-            NSWorkspace.shared.openFile(kConfigFolderPath)
+            NSWorkspace.shared.openFilePath(kConfigFolderPath)
         }
     }
 
