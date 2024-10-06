@@ -34,7 +34,7 @@ public class DashboardWindowController: NSWindowController {
 	}
 	
 	public func reload() {
-		NotificationCenter.default.post(name: .reloadDashboard, object: nil)
+#warning("todo reload dashboard")		
 	}
 }
 
