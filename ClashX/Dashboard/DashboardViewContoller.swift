@@ -32,10 +32,6 @@ public class DashboardWindowController: NSWindowController {
 		ConfigManager.shared.overrideApiURL = .init(string: apiURL)
 		ConfigManager.shared.overrideSecret = secret
 	}
-	
-	public func reload() {
-#warning("todo reload dashboard")		
-	}
 }
 
 extension DashboardWindowController: NSWindowDelegate {
