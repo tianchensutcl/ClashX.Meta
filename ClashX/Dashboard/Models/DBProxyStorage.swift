@@ -103,7 +103,7 @@ class DBProxy: ObservableObject {
 		
 		switch delay {
 		case 0:
-			return .gray
+            return .red
 		case ..<200 where !httpsTest:
 			return .green
 		case ..<800 where httpsTest:
