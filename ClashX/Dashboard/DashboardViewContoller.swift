@@ -271,6 +271,8 @@ extension DashboardViewContoller: NSToolbarDelegate, NSToolbarItemValidation {
 			group.controlRepresentation = .collapsed
 			group.selectedIndex = levels.firstIndex(of: ConfigManager.selectLoggingApiLevel) ?? 0
 			
+            group.label = "Log Level"
+            
 			return group
         case .logFilterItem:
             let titles = LogFilter.allCases.map {
@@ -282,6 +284,9 @@ extension DashboardViewContoller: NSToolbarDelegate, NSToolbarItemValidation {
             group.selectionMode = .selectOne
             group.controlRepresentation = .collapsed
             group.selectedIndex = 0
+            
+            group.label = "Log Filter"
+            
             return group
 		case .hideNamesItem:
 			let item = NSToolbarItem(itemIdentifier: .hideNamesItem)
@@ -290,6 +295,9 @@ extension DashboardViewContoller: NSToolbarDelegate, NSToolbarItemValidation {
 			item.isBordered = true
 			item.tag = 0
 			item.image = NSImage(systemSymbolName: "wand.and.stars", accessibilityDescription: nil)
+            
+            item.label = "Hide Names"
+            
 			return item
 		case .stopConnsItem:
 			let item = NSToolbarItem(itemIdentifier: .stopConnsItem)
@@ -297,6 +305,9 @@ extension DashboardViewContoller: NSToolbarDelegate, NSToolbarItemValidation {
 			item.action = #selector(stopConns(_:))
 			item.isBordered = true
 			item.image = NSImage(systemSymbolName: "stop.circle.fill", accessibilityDescription: nil)
+            
+            item.label = "Stop All"
+            
 			return item
 		default:
 			break
