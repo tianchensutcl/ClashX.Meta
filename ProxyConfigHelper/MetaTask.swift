@@ -33,6 +33,7 @@ class MetaTask: NSObject {
         }
 		
 		proc.executableURL = .init(fileURLWithPath: path)
+        proc.currentDirectoryURL = .init(fileURLWithPath: confPath)
         
         var args = [
             "-d",
@@ -54,6 +55,11 @@ class MetaTask: NSObject {
 				returnResult("Can't decode config file.")
 				return
 			}
+            
+            var environment = ProcessInfo.processInfo.environment
+            environment["SAFE_PATHS"] = serverResult.safePaths
+
+            self.proc.environment = environment
 			
 			self.proc.arguments = args
 			self.proc.qualityOfService = .userInitiated
@@ -163,7 +169,7 @@ class MetaTask: NSObject {
                 if results.count == 0 {
                     results = logs.map(self.formatMsg(_:))
                 }
-				
+                
 				returnResult(results.joined(separator: "\n"))
 			}
 			
