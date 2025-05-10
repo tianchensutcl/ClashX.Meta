@@ -158,7 +158,11 @@ class MetaTask: NSObject {
 					return
 				}
 				
-				let results = string.split(separator: "\n").map(String.init).map(self.formatMsg(_:))
+				var results = string.split(separator: "\n").map(String.init).map(self.formatMsg(_:))
+				
+                if results.count == 0 {
+                    results = logs.map(self.formatMsg(_:))
+                }
 				
 				returnResult(results.joined(separator: "\n"))
 			}
