@@ -150,7 +150,7 @@ class ApiRequest {
                 return
             }
             
-            let tempFile = ".clashx_meta_config"
+            let tempFile = kSafeConfigName
             let tempPath = Paths.localConfigPath(for: tempFile)
             
             try? FileManager.default.removeItem(atPath: tempPath)
